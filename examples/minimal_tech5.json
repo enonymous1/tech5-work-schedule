@@ -1,0 +1,52 @@
+{
+  "project_meta": {
+    "project_name": "Example Work Schedule",
+    "time_unit_label": "Months",
+    "total_duration": 4
+  },
+  "schedule_items": [
+    {
+      "active_periods": [
+        "1-2"
+      ],
+      "description": "PHASE 1: INCEPTION",
+      "id": "A-1",
+      "total_text": "2 Weeks",
+      "type": "Phase"
+    },
+    {
+      "active_periods": [
+        1
+      ],
+      "description": "Kick-off meeting",
+      "id": "A-1.1",
+      "type": "Activity"
+    },
+    {
+      "active_periods": [
+        2
+      ],
+      "description": "Data collection plan",
+      "id": "A-1.1a",
+      "type": "Sub-Activity"
+    },
+    {
+      "active_periods": [
+        2
+      ],
+      "description": "DELIVERABLE 1: INCEPTION REPORT",
+      "id": "D-1",
+      "is_milestone": true,
+      "total_text": "Week 2",
+      "type": "Deliverable"
+    },
+    {
+      "active_periods": [
+        4
+      ],
+      "description": "DELIVERABLE 2: PROGRESS NOTE (no milestone flag)",
+      "id": "D-2",
+      "type": "Deliverable"
+    }
+  ]
+}

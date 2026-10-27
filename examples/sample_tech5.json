@@ -1,0 +1,217 @@
+{
+  "project_meta": {
+    "project_name": "National Interoperability Framework - Example Schedule",
+    "rfp_reference": "{Insert RFP reference}",
+    "time_unit_label": "Months",
+    "total_duration": 9
+  },
+  "schedule_items": [
+    {
+      "id": "A-1",
+      "description": "PHASE 1: INCEPTION & MOBILIZATION",
+      "type": "Phase",
+      "active_periods": [
+        1
+      ],
+      "total_text": "2 Weeks"
+    },
+    {
+      "id": "A-1.1",
+      "description": "Kick-off Meeting & Stakeholder Mobilization (Client Agency)",
+      "type": "Activity",
+      "active_periods": [
+        1
+      ]
+    },
+    {
+      "id": "A-1.2",
+      "description": "Methodology Refinement & Data Collection Plan",
+      "type": "Activity",
+      "active_periods": [
+        1
+      ]
+    },
+    {
+      "id": "D-1",
+      "description": "DELIVERABLE 1: INCEPTION REPORT (Due Week 2)",
+      "type": "Deliverable",
+      "active_periods": [
+        1
+      ],
+      "is_milestone": true,
+      "total_text": "Week 2"
+    },
+    {
+      "id": "A-2",
+      "description": "PHASE 2: ASSESSMENT & OPTIONS ANALYSIS",
+      "type": "Phase",
+      "active_periods": [
+        1,
+        2,
+        3
+      ],
+      "total_text": "8 Weeks"
+    },
+    {
+      "id": "A-2.1",
+      "description": "Assessment of Government Gateway (GG): Tech Audit of existing APIs, hardware, and licensing",
+      "type": "Activity",
+      "active_periods": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "A-2.2",
+      "description": "Business Needs Mapping: Workshops with Key Line Ministries",
+      "type": "Activity",
+      "active_periods": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "A-2.3",
+      "description": "Options Analysis: Comparison of GSB options (Commercial vs. Open Source/X-Road) & Costing (TCO)",
+      "type": "Activity",
+      "active_periods": [
+        3
+      ]
+    },
+    {
+      "id": "A-2.4",
+      "description": "Workshop 1: \"As-Is\" Findings & \"To-Be\" Options Validation",
+      "type": "Activity",
+      "active_periods": [
+        3
+      ]
+    },
+    {
+      "id": "D-2",
+      "description": "DELIVERABLE 2: 1ST INTERIM REPORT (GG Assessment & Options) (Due Week 10)",
+      "type": "Deliverable",
+      "active_periods": [
+        3
+      ],
+      "is_milestone": true,
+      "total_text": "Week 10"
+    },
+    {
+      "id": "A-3",
+      "description": "PHASE 3: FRAMEWORK DESIGN & CONCEPTUAL MODEL",
+      "type": "Phase",
+      "active_periods": [
+        4,
+        5
+      ],
+      "total_text": "10 Weeks"
+    },
+    {
+      "id": "A-3.1",
+      "description": "Legal Interoperability Layer: \"Digital Check\" of legislation & drafting EIF-aligned legal principles",
+      "type": "Activity",
+      "active_periods": [
+        4,
+        5
+      ]
+    },
+    {
+      "id": "A-3.2",
+      "description": "Organizational Layer: Defining SLAs and Business Process Re-engineering (BPR) Guidelines",
+      "type": "Activity",
+      "active_periods": [
+        4,
+        5
+      ]
+    },
+    {
+      "id": "A-3.3",
+      "description": "Semantic Layer: Defining \"Core Person/Business\" Data Standards",
+      "type": "Activity",
+      "active_periods": [
+        5
+      ]
+    },
+    {
+      "id": "A-3.4",
+      "description": "Technical Layer: Security, Cryptography, and Transport Standards (ISO 27001)",
+      "type": "Activity",
+      "active_periods": [
+        5
+      ]
+    },
+    {
+      "id": "A-3.5",
+      "description": "Workshop 2: Framework Governance & Conceptual Model Review",
+      "type": "Activity",
+      "active_periods": [
+        5
+      ]
+    },
+    {
+      "id": "D-3",
+      "description": "DELIVERABLE 3: 2ND INTERIM REPORT (Framework Design & EIF Mapping) (Due Week 20)",
+      "type": "Deliverable",
+      "active_periods": [
+        5
+      ],
+      "is_milestone": true,
+      "total_text": "Week 20"
+    },
+    {
+      "id": "A-4",
+      "description": "PHASE 4: FINAL SPECIFICATIONS & TRANSITION",
+      "type": "Phase",
+      "active_periods": [
+        6,
+        7,
+        8
+      ],
+      "total_text": "15 Weeks"
+    },
+    {
+      "id": "A-4.1",
+      "description": "Drafting Technical Specifications: Functional/Non-Functional Reqs for the new Platform (RFB inputs)",
+      "type": "Activity",
+      "active_periods": [
+        6,
+        7
+      ]
+    },
+    {
+      "id": "A-4.2",
+      "description": "Transition Planning: Migration strategy for existing services to the new Platform",
+      "type": "Activity",
+      "active_periods": [
+        6,
+        7
+      ]
+    },
+    {
+      "id": "A-4.3",
+      "description": "Capacity Building Program: Training for client staff on framework maintenance and procurement evaluation",
+      "type": "Activity",
+      "active_periods": [
+        7
+      ]
+    },
+    {
+      "id": "A-4.4",
+      "description": "Final Review & Validation with the Client",
+      "type": "Activity",
+      "active_periods": [
+        8
+      ]
+    },
+    {
+      "id": "D-4",
+      "description": "DELIVERABLE 4: FINAL REPORT (Specs, Bidding Docs, Transition Plan) (Due Week 35)",
+      "type": "Deliverable",
+      "active_periods": [
+        8
+      ],
+      "is_milestone": true,
+      "total_text": "Week 35"
+    }
+  ]
+}
