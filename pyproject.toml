@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tech5-work-schedule"
-version = "2.0.1"
+version = "2.1.0"
 description = "Generate World Bank TECH-5 work-schedule workbooks (Excel bar charts) from structured JSON configs."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,11 +13,14 @@ authors = [{ name = "enonymous1" }]
 keywords = ["tech-5", "work-schedule", "excel", "openpyxl", "cli", "world-bank"]
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "openpyxl>=3.1",
+    "openpyxl>=3.1,<4",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +36,9 @@ tech5-work-schedule = "tech5_work_schedule.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/enonymous1/tech5-work-schedule"
+Repository = "https://github.com/enonymous1/tech5-work-schedule"
+Issues = "https://github.com/enonymous1/tech5-work-schedule/issues"
+Changelog = "https://github.com/enonymous1/tech5-work-schedule/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -34,12 +34,35 @@ from __future__ import annotations
 import json
 from collections.abc import Collection
 from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 from .errors import ConfigError
 
-ITEM_TYPES = frozenset({"Phase", "Activity", "Deliverable", "Sub-Activity"})
+
+class ItemType(StrEnum):
+    """The four schedule-item kinds, as written in configs.
+
+    A StrEnum (Python 3.11+) keeps the config-facing strings — "Phase",
+    "Activity", "Deliverable", "Sub-Activity" — while giving the rest of
+    the code a closed type instead of a bare ``str`` that accepts
+    anything. Comparisons with plain strings still work, so existing
+    code comparing ``item.type == "Phase"`` is unaffected.
+    """
+
+    PHASE = "Phase"
+    ACTIVITY = "Activity"
+    DELIVERABLE = "Deliverable"
+    SUB_ACTIVITY = "Sub-Activity"
+
+
+ITEM_TYPES = frozenset(str(t) for t in ItemType)
+
+# The only schema version this release accepts. Versioning is cheap
+# insurance: the next schema change can keep accepting 1 and add 2,
+# instead of breaking every existing config at once.
+SCHEMA_VERSION = 1
 
 # A TECH-5 bar chart is unreadable under fit-to-width printing long
 # before Excel's 16,384-column limit, so the schedule length is capped.
@@ -52,11 +75,17 @@ _META_KEYS = frozenset(
 _ITEM_KEYS = frozenset(
     {"id", "description", "type", "active_periods", "is_milestone", "total_text"}
 )
-_TOP_KEYS = frozenset({"project_meta", "schedule_items"})
+_TOP_KEYS = frozenset({"project_meta", "schedule_items", "schema_version"})
 
 
 @dataclass(frozen=True)
 class ProjectMeta:
+    """Project-level metadata: name, length, time-unit label, RFP reference.
+
+    ``time_unit_label`` is a display label only — periods are ordinals
+    in that unit, and no date arithmetic is performed anywhere.
+    """
+
     project_name: str
     total_duration: int
     time_unit_label: str = "Months"
@@ -65,9 +94,17 @@ class ProjectMeta:
 
 @dataclass(frozen=True)
 class ScheduleItem:
+    """One schedule row.
+
+    ``total_text`` is author-supplied display text for the Total column
+    (for example "2 Weeks" or "Week 10"), not a value computed from
+    ``active_periods``. The renderer prints it verbatim, so a wrong
+    total is rendered faithfully — check totals before generating.
+    """
+
     id: str
     description: str
-    type: str
+    type: ItemType
     active_periods: tuple[int, ...]
     is_milestone: bool = False
     total_text: str | None = None
@@ -75,8 +112,11 @@ class ScheduleItem:
 
 @dataclass(frozen=True)
 class Config:
+    """A fully validated config: metadata plus its schedule items."""
+
     meta: ProjectMeta
     items: tuple[ScheduleItem, ...]
+    schema_version: int = SCHEMA_VERSION
 
 
 def _fail(path: str, message: str) -> ConfigError:
@@ -182,16 +222,24 @@ def _parse_meta(data: Any) -> ProjectMeta:
 
 
 def _parse_item(data: Any, index: int, total_duration: int) -> ScheduleItem:
+    """Validate one schedule item, including its type and periods.
+
+    Periods are expanded (ranges become concrete numbers), checked
+    against the duration, and de-duplicated, so the renderer never has
+    to reason about ranges or overlaps.
+    """
     path = f"schedule_items[{index}]"
     if not isinstance(data, dict):
         raise _fail(path, "must be an object")
     _check_keys(data, _ITEM_KEYS, {"id", "description", "type", "active_periods"}, path)
-    item_type = _as_non_empty_str(data["type"], f"{path}.type")
-    if item_type not in ITEM_TYPES:
+    raw_type = _as_non_empty_str(data["type"], f"{path}.type")
+    try:
+        item_type = ItemType(raw_type)
+    except ValueError:
         raise _fail(
             f"{path}.type",
-            f"must be one of {', '.join(sorted(ITEM_TYPES))}, got {item_type!r}",
-        )
+            f"must be one of {', '.join(sorted(ITEM_TYPES))}, got {raw_type!r}",
+        ) from None
     raw_periods = data["active_periods"]
     if not isinstance(raw_periods, list) or not raw_periods:
         raise _fail(f"{path}.active_periods", "must be a non-empty list")
@@ -219,7 +267,12 @@ def _parse_item(data: Any, index: int, total_duration: int) -> ScheduleItem:
 
 
 def parse_config(data: Any) -> Config:
-    """Validate a decoded JSON document and return a Config."""
+    """Validate a decoded JSON document and return a Config.
+
+    ``schema_version`` is optional and defaults to 1; any other value
+    is rejected so a config written for a future schema fails loudly
+    instead of being misread under today's rules.
+    """
     if not isinstance(data, dict):
         raise ConfigError("config root: must be a JSON object")
     if "project_metadata" in data or "phases" in data:
@@ -227,7 +280,17 @@ def parse_config(data: Any) -> Config:
             "config root: unsupported schema using 'project_metadata'/'phases'; "
             "use 'project_meta' and 'schedule_items' (see examples/sample_tech5.json)"
         )
-    _check_keys(data, _TOP_KEYS, _TOP_KEYS, "config root")
+    _check_keys(data, _TOP_KEYS, {"project_meta", "schedule_items"}, "config root")
+    schema_version = data.get("schema_version", SCHEMA_VERSION)
+    if (
+        isinstance(schema_version, bool)
+        or not isinstance(schema_version, int)
+        or schema_version != SCHEMA_VERSION
+    ):
+        raise ConfigError(
+            f"config root.schema_version: must be {SCHEMA_VERSION}, "
+            f"got {schema_version!r}"
+        )
     meta = _parse_meta(data["project_meta"])
     raw_items = data["schedule_items"]
     if not isinstance(raw_items, list) or not raw_items:
@@ -241,7 +304,7 @@ def parse_config(data: Any) -> Config:
         if item.id in seen:
             raise ConfigError(f"schedule_items: duplicate id {item.id!r}")
         seen.add(item.id)
-    return Config(meta=meta, items=items)
+    return Config(meta=meta, items=items, schema_version=schema_version)
 
 
 def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="tech5-work-schedule architecture: JSON config flows through config validation into the renderer, which produces a workbook that the verifier checks">
+  <style>
+    .box { fill: #ddebf7; stroke: #2f5597; stroke-width: 1.5; }
+    .box2 { fill: #e2efda; stroke: #375623; stroke-width: 1.5; }
+    .cli { fill: #fff2cc; stroke: #7f6000; stroke-width: 1.5; }
+    .text { font-family: sans-serif; font-size: 13px; fill: #1a1a1a; }
+    .small { font-size: 11px; fill: #404040; }
+    .arrow { stroke: #404040; stroke-width: 1.5; fill: none; marker-end: url(#head); }
+  </style>
+  <defs>
+    <marker id="head" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#404040"/>
+    </marker>
+  </defs>
+  <rect x="20" y="110" width="150" height="60" rx="6" class="box"/>
+  <text x="95" y="135" text-anchor="middle" class="text">JSON config</text>
+  <text x="95" y="155" text-anchor="middle" class="small">examples/*.json</text>
+  <rect x="230" y="110" width="170" height="60" rx="6" class="box"/>
+  <text x="315" y="135" text-anchor="middle" class="text">config.load_config</text>
+  <text x="315" y="155" text-anchor="middle" class="small">strict validation</text>
+  <rect x="460" y="110" width="170" height="60" rx="6" class="box"/>
+  <text x="545" y="135" text-anchor="middle" class="text">render.build_workbook</text>
+  <text x="545" y="155" text-anchor="middle" class="small">Theme + Layout + markers</text>
+  <rect x="690" y="110" width="150" height="60" rx="6" class="box2"/>
+  <text x="765" y="135" text-anchor="middle" class="text">.xlsx workbook</text>
+  <text x="765" y="155" text-anchor="middle" class="small">sheet TECH-5</text>
+  <rect x="460" y="220" width="170" height="60" rx="6" class="box2"/>
+  <text x="545" y="245" text-anchor="middle" class="text">verify.verify_files</text>
+  <text x="545" y="265" text-anchor="middle" class="small">content + style check</text>
+  <rect x="230" y="220" width="170" height="60" rx="6" class="cli"/>
+  <text x="315" y="245" text-anchor="middle" class="text">CLI</text>
+  <text x="315" y="265" text-anchor="middle" class="small">validate | generate | verify</text>
+  <path d="M 170 140 L 230 140" class="arrow"/>
+  <path d="M 400 140 L 460 140" class="arrow"/>
+  <path d="M 630 140 L 690 140" class="arrow"/>
+  <path d="M 765 170 L 765 220 L 630 220 L 630 250" class="arrow"/>
+  <path d="M 460 250 L 400 250" class="arrow"/>
+</svg>

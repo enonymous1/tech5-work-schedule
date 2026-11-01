@@ -9,7 +9,7 @@ from collections import Counter
 from . import __version__
 from .config import load_config
 from .errors import ConfigError
-from .generator import generate
+from .io import generate
 from .verify import verify_files
 
 
@@ -37,7 +37,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     ver = sub.add_parser(
         "verify",
-        help="Check a generated workbook's content against its config.",
+        help="Check a generated workbook's content and key styling against its config.",
     )
     ver.add_argument("--config", required=True, help="Path to a JSON config file.")
     ver.add_argument(

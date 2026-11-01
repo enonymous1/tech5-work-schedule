@@ -1,5 +1,43 @@
 # Changelog
 
+## 2.1.0 — 2026-11-01
+
+Structural release from the 2026-10-31 staff review. Generated workbooks
+are byte-for-byte equivalent in layout to 2.0.1 (same default theme);
+the changes are internal, plus `verify` now also checks styling.
+
+- New `markers` module: `marker_for()` is the single source of truth
+  for the legend's marker rule; renderer, verifier, and tests import it.
+- New `layout` module: a frozen `Layout` dataclass computes Total
+  column, data rows, freeze panes, and print titles once per workbook.
+- New `theme` module: a frozen `Theme` dataclass holds colours, fonts,
+  and widths; `build_workbook(config, theme=...)` renders with it and
+  `verify_workbook(path, config, theme=...)` checks against it. The
+  default theme reproduces the 2.0.0/2.0.1 look exactly.
+- `generator.py` split into `render.py` (workbook rendering) and
+  `io.py` (filenames and file saving); `generator` remains as a
+  backwards-compatible re-export shim.
+- `ScheduleItem.type` is now a `StrEnum` (`ItemType`); comparisons with
+  plain strings still work.
+- Optional `schema_version` key (absent means 1; any other value is
+  rejected) so a future schema change can keep accepting old configs.
+- Long descriptions now wrap and grow their row height instead of
+  being clipped at the column-width cap; guidance-note row heights are
+  estimated from the final column widths instead of fixed at 45/25/20.
+- `verify` now checks key styling against the theme (header/phase/
+  deliverable fills, milestone marker colour and boldness, font name,
+  freeze panes, page orientation, paper size, fit-to-width, print
+  titles). A style-stripped workbook now fails verification.
+- `slugify` is Unicode-aware: accented letters survive, only path
+  separators, control characters, and Windows-reserved characters are
+  removed.
+- Public API exported from the package root (`Config`, `ItemType`,
+  `Layout`, `Theme`, `build_workbook`, `generate`, `load_config`,
+  `marker_for`, `verify_files`, `verify_workbook`, and more).
+- CI now also runs on Windows (Python 3.12) and checks that the package
+  builds (`python -m build`, `twine check`). The README was replaced
+  with the staff-review proposal, updated for 2.1.0.
+
 ## 2.0.1 — 2026-11-01
 
 Correctness fixes from the 2026-10-31 staff review. No layout, schema,
