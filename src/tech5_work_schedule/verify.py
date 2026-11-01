@@ -4,13 +4,22 @@ This replaces the original ``inspect_totals.py``, which hardcoded the
 rough draft's layout, found no Total column in it, and exited 0 anyway.
 ``verify_workbook`` returns every mismatch it finds; an empty list means
 the workbook matches the config exactly.
+
+This is a *content* check in v2.0.1: it compares titles, ids,
+descriptions, markers, Total texts, legend, and notes. It deliberately
+does NOT check fills, fonts, freeze panes, or print setup — a
+style-stripped workbook still verifies. Do not promise formatting
+verification from this function (see the v2.1.0 style checks for the
+extension of this contract).
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from zipfile import BadZipFile
 
 import openpyxl
+from openpyxl.utils.exceptions import InvalidFileException
 
 from .config import Config, load_config
 from .errors import ConfigError
@@ -28,13 +37,20 @@ _MARKERS = {"█", "X", "♦"}
 
 
 def verify_workbook(workbook_path: str | Path, config: Config) -> list[str]:
+    """Check a workbook's *content* against a config; [] means match.
+
+    Compares titles, ids, descriptions, markers, Total texts, legend,
+    and notes. It deliberately does NOT check fills, fonts, freeze
+    panes, or print setup in v2.0.1 — a style-stripped workbook still
+    verifies. See the module docstring for the contract.
+    """
     mismatches: list[str] = []
     path = Path(workbook_path)
     if not path.exists():
         return [f"workbook not found: {path}"]
     try:
         wb = openpyxl.load_workbook(path)
-    except Exception as exc:  # openpyxl raises several types for bad files
+    except (OSError, InvalidFileException, BadZipFile) as exc:
         return [f"cannot read workbook {path}: {exc}"]
     if SHEET_TITLE not in wb.sheetnames:
         return [f"missing sheet {SHEET_TITLE!r}; sheets are {wb.sheetnames}"]

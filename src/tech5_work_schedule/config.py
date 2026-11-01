@@ -41,6 +41,11 @@ from .errors import ConfigError
 
 ITEM_TYPES = frozenset({"Phase", "Activity", "Deliverable", "Sub-Activity"})
 
+# A TECH-5 bar chart is unreadable under fit-to-width printing long
+# before Excel's 16,384-column limit, so the schedule length is capped.
+# Split longer programmes into phases or use a coarser time unit.
+MAX_TOTAL_DURATION = 240
+
 _META_KEYS = frozenset(
     {"project_name", "rfp_reference", "time_unit_label", "total_duration"}
 )
@@ -143,12 +148,24 @@ def _parse_period(value: Any, path: str, total_duration: int) -> list[int]:
 
 
 def _parse_meta(data: Any) -> ProjectMeta:
+    """Validate project metadata, including the duration cap.
+
+    The upper bound exists because the renderer creates one column per
+    period: an unbounded duration would build a workbook Excel cannot
+    open (see MAX_TOTAL_DURATION).
+    """
     if not isinstance(data, dict):
         raise _fail("project_meta", "must be an object")
     _check_keys(data, _META_KEYS, {"project_name", "total_duration"}, "project_meta")
     total_duration = _as_int(data["total_duration"], "project_meta.total_duration")
     if total_duration < 1:
         raise _fail("project_meta.total_duration", "must be at least 1")
+    if total_duration > MAX_TOTAL_DURATION:
+        raise _fail(
+            "project_meta.total_duration",
+            f"must not exceed {MAX_TOTAL_DURATION}; split the schedule "
+            "into phases or use a coarser time unit",
+        )
     rfp_reference = data.get("rfp_reference")
     if rfp_reference is not None:
         rfp_reference = _as_non_empty_str(rfp_reference, "project_meta.rfp_reference")
@@ -227,8 +244,28 @@ def parse_config(data: Any) -> Config:
     return Config(meta=meta, items=items)
 
 
+def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """``object_pairs_hook`` that rejects duplicate JSON keys.
+
+    ``json.loads`` silently keeps the last value for a repeated key, so
+    a copy-paste error in a config would disappear without a trace.
+    Raising here (a ConfigError, not a JSONDecodeError) makes the
+    duplicate a named validation failure instead.
+    """
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ConfigError(f"duplicate key {key!r} in config JSON")
+        result[key] = value
+    return result
+
+
 def load_config(path: str | Path) -> Config:
-    """Read and validate a config file."""
+    """Read and validate a config file.
+
+    Duplicate JSON keys are rejected (see ``_no_duplicates``); all other
+    failures are reported as ConfigError with the file path included.
+    """
     config_path = Path(path)
     try:
         text = config_path.read_text(encoding="utf-8")
@@ -237,7 +274,7 @@ def load_config(path: str | Path) -> Config:
     except OSError as exc:
         raise ConfigError(f"cannot read config file {config_path}: {exc}") from exc
     try:
-        data = json.loads(text)
+        data = json.loads(text, object_pairs_hook=_no_duplicates)
     except json.JSONDecodeError as exc:
         raise ConfigError(f"{config_path}: invalid JSON: {exc}") from exc
     try:

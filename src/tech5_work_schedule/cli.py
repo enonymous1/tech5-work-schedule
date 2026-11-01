@@ -36,7 +36,8 @@ def _build_parser() -> argparse.ArgumentParser:
     val.add_argument("--config", required=True, help="Path to a JSON config file.")
 
     ver = sub.add_parser(
-        "verify", help="Check a generated workbook against its config."
+        "verify",
+        help="Check a generated workbook's content against its config.",
     )
     ver.add_argument("--config", required=True, help="Path to a JSON config file.")
     ver.add_argument(
@@ -46,10 +47,19 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _cmd_generate(args: argparse.Namespace) -> int:
+    """Generate a workbook, reporting config and I/O errors cleanly.
+
+    Config problems and filesystem problems (permission denied, output
+    path is a directory, disk full) are user errors, not bugs, so they
+    get a one-line message and exit code 2 instead of a traceback.
+    """
     try:
         output = generate(args.config, args.output)
     except ConfigError as exc:
         print(f"error: {exc}", file=sys.stderr)
+        return 2
+    except OSError as exc:
+        print(f"error: cannot write workbook: {exc}", file=sys.stderr)
         return 2
     print(f"Wrote: {output}")
     return 0
@@ -84,6 +94,13 @@ def _cmd_verify(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """CLI entry point. Returns an exit code; never raises for bad input.
+
+    Exit codes: 0 success, 1 verify mismatch, 2 usage/config/I-O error.
+    Note argparse itself exits (via SystemExit) on usage errors and on
+    ``--version`` — callers embedding ``main()`` as a library function
+    must expect SystemExit, not just an int return.
+    """
     args = _build_parser().parse_args(argv)
     if args.command == "generate":
         return _cmd_generate(args)

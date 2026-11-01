@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.0.1 — 2026-11-01
+
+Correctness fixes from the 2026-10-31 staff review. No layout, schema,
+or API change.
+
+- Fixed guidance note 2 rendering with a double period ("bar chart..").
+- Capped `total_duration` at 240: an unbounded duration could build a
+  workbook Excel cannot open.
+- Default-named outputs no longer overwrite each other within the same
+  second: a collision now gets a `-2`, `-3`, ... suffix. Explicit
+  `--output` paths still overwrite, as before.
+- CLI `generate` reports filesystem errors (permission denied, output
+  path is a directory, disk full) as a one-line error with exit code 2
+  instead of a traceback.
+- Duplicate JSON keys are now rejected instead of silently keeping the
+  last value.
+- Documented `verify` as a content-only check (it does not check fills,
+  fonts, freeze panes, or print setup in this release) and narrowed its
+  workbook-load error handling to the failures a bad file produces.
+- Exit-code contract documented in `cli.main` (0 success, 1 verify
+  mismatch, 2 usage/config/I/O error).
+
 ## 2.0.0 — 2026-10-27
 
 Sanitized public export and modernization of the original `mp-tech5` project (formerly a single script pair, `generator.py` + `inspect_totals.py`). The original git history is not carried over; this is a fresh export under the public identity. The original Kosovo configs, rough-draft workbook, and blank template binary are not shipped; the bundled example is fictional data only, with the RFP reference replaced by `{Insert RFP reference}`.

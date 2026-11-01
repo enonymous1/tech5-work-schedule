@@ -213,7 +213,6 @@ def _render_legend_and_notes(ws: Worksheet, total_col: int, last_data_row: int) 
             InlineFont(rFont=FONT_NAME, sz=FONT_SIZE, u="single"),
             "in a form of a bar chart.",
         ),
-        TextBlock(InlineFont(rFont=FONT_NAME, sz=FONT_SIZE), "."),
     )
     notes: list[tuple[str | CellRichText, int]] = [
         (
@@ -293,23 +292,40 @@ def slugify(project_name: str) -> str:
     return slug[:60] or "Output"
 
 
+def _default_output_path(project_name: str) -> Path:
+    """Return a non-existent default output path, numbering collisions.
+
+    The timestamp has one-second resolution, so two runs in the same
+    second would otherwise return the same filename and the second run
+    would silently overwrite the first. Numbered suffixes (``-2``,
+    ``-3``, ...) keep every default-named run's output.
+    """
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    stem = f"TECH5_{slugify(project_name)}_{timestamp}"
+    candidate = output_dir / f"{stem}.xlsx"
+    counter = 2
+    while candidate.exists():
+        candidate = output_dir / f"{stem}-{counter}.xlsx"
+        counter += 1
+    return candidate
+
+
 def generate(config_path: str | Path, output: str | Path | None = None) -> Path:
     """Generate a workbook from a config file and return its path.
 
     With no ``output``, the workbook goes to ``output/`` under the current
-    working directory, named ``TECH5_<project>_<timestamp>.xlsx``. With an
-    explicit ``output``, that exact path is used and parent directories
-    are created.
+    working directory, named ``TECH5_<project>_<timestamp>.xlsx`` (with a
+    ``-2``, ``-3``, ... suffix if that name already exists, so a
+    default-named run never overwrites an earlier file). With an
+    explicit ``output``, that exact path is used — and overwritten if it
+    exists — and parent directories are created.
     """
     config = load_config(config_path)
     wb = build_workbook(config)
     if output is None:
-        output_dir = Path("output")
-        output_dir.mkdir(exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = (
-            output_dir / f"TECH5_{slugify(config.meta.project_name)}_{timestamp}.xlsx"
-        )
+        output_path = _default_output_path(config.meta.project_name)
     else:
         output_path = Path(output)
         if output_path.parent != Path(""):

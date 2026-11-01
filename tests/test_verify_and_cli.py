@@ -115,7 +115,9 @@ def test_cli_verify_mismatch_returns_1(tmp_path: Path, capsys) -> None:
 
 
 def test_cli_version(capsys) -> None:
+    from tech5_work_schedule import __version__
+
     with pytest.raises(SystemExit) as excinfo:
         main(["--version"])
     assert excinfo.value.code == 0
-    assert "2.0.0" in capsys.readouterr().out
+    assert __version__ in capsys.readouterr().out
